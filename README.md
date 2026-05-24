@@ -54,6 +54,14 @@ Resume-Builder/
 ├── pdf_generator.py
 └── README.md
 
+## Project Structure
+
+```text
+Resume-Builder/
+│             
+├── gui_interface.py     
+├── input_validation.py  
+          
 ## Installation
  - Open project in VS Code
  - Install required library
