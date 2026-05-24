@@ -53,3 +53,7 @@ Resume-Builder/
 ├── resume_logic.py
 ├── pdf_generator.py
 └── README.md
+
+## Installation
+ - Open project in VS Code
+ - Install required library
