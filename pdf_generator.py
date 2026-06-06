@@ -73,9 +73,11 @@ class PDFResumeGenerator:
         if data['education']:
             story.append(self._underlined_title("EDUCATION", color))
             for edu in data['education']:
-                story.append(Paragraph(f"<b>{edu['degree']}</b>", self.styles['Normal']))
-                story.append(Paragraph(f"{edu['institution']} - {edu['year']}", self.styles['Normal']))
-                story.append(Spacer(1, 0.05 * inch))
+                edu_text = f"<b>Degree:</b> {edu['degree']}<br/>"
+                edu_text += f"<b>Institution:</b> {edu['institution']}<br/>"
+                edu_text += f"<b>Year:</b> {edu['year']}"
+                story.append(Paragraph(edu_text, self.styles['Normal']))
+                story.append(Spacer(1, 0.08 * inch))
         
         return story
     
@@ -91,9 +93,11 @@ class PDFResumeGenerator:
         if data['education']:
             story.append(self._underlined_title("EDUCATION", color))
             for edu in data['education']:
-                story.append(Paragraph(f"<b>{edu['degree']}</b>", self.styles['Normal']))
-                story.append(Paragraph(f"{edu['institution']}, {edu['year']}", self.styles['Normal']))
-                story.append(Spacer(1, 0.05 * inch))
+                edu_text = f"<b>Degree:</b> {edu['degree']}<br/>"
+                edu_text += f"<b>Institution:</b> {edu['institution']}<br/>"
+                edu_text += f"<b>Year:</b> {edu['year']}"
+                story.append(Paragraph(edu_text, self.styles['Normal']))
+                story.append(Spacer(1, 0.08 * inch))
         
         if data['skills']:
             story.append(self._underlined_title("SKILLS", color))
@@ -133,9 +137,11 @@ class PDFResumeGenerator:
         if data['education']:
             story.append(self._underlined_title("ACADEMIC BACKGROUND", color))
             for edu in data['education']:
-                story.append(Paragraph(f"<b>{edu['degree']}</b>", self.styles['Normal']))
-                story.append(Paragraph(f"{edu['institution']} • {edu['year']}", self.styles['Normal']))
-                story.append(Spacer(1, 0.05 * inch))
+                edu_text = f"<b>Degree:</b> {edu['degree']}<br/>"
+                edu_text += f"<b>Institution:</b> {edu['institution']}<br/>"
+                edu_text += f"<b>Year:</b> {edu['year']}"
+                story.append(Paragraph(edu_text, self.styles['Normal']))
+                story.append(Spacer(1, 0.08 * inch))
         
         return story
     
