@@ -31,9 +31,9 @@ class PDFResumeGenerator:
         style_name = ParagraphStyle('Name', parent=self.styles['Heading1'],
                                       fontSize=name_size, textColor=main_color,
                                       spaceAfter=8, alignment=0, fontName='Helvetica-Bold')
-        story.append(Paragraph(info.get('name', 'YOUR NAME'), style_name))
+        story.append(Paragraph(f"✨ {info.get('name', 'YOUR NAME')} ✨", style_name))
         
-        contact = f"{info.get('email', '')}  |  {info.get('phone', '')}  |  {info.get('address', '')}"
+        contact = f"📧 {info.get('email', '')}  |  📞 {info.get('phone', '')}  |  📍 {info.get('address', '')}"
         style_contact = ParagraphStyle('Contact', parent=self.styles['Normal'],
                                         fontSize=9, textColor=colors.HexColor('#666666'),
                                         spaceAfter=15, alignment=0)
@@ -46,13 +46,13 @@ class PDFResumeGenerator:
         
         if your_data.get('summary'):
             story.append(self._section_title("📋 PROFILE SUMMARY", main_color))
-            story.append(Paragraph(your_data['summary'], self.styles['Normal']))
+            story.append(Paragraph(f"💬 {your_data['summary']}", self.styles['Normal']))
             story.append(Spacer(1, 0.12 * inch))
         
         if your_data['skills']:
             story.append(self._section_title("💡 CORE SKILLS", main_color))
             skills_text = "  ◉  ".join([s['name'] for s in your_data['skills']])
-            story.append(Paragraph(skills_text, self.styles['Normal']))
+            story.append(Paragraph(f"⚡ {skills_text}", self.styles['Normal']))
             story.append(Spacer(1, 0.12 * inch))
         
         if your_data['experience']:
@@ -61,12 +61,12 @@ class PDFResumeGenerator:
                 style_job = ParagraphStyle('Job', parent=self.styles['Normal'],
                                             fontSize=12, textColor=main_color,
                                             spaceAfter=4, fontName='Helvetica-Bold')
-                story.append(Paragraph(job['title'], style_job))
+                story.append(Paragraph(f"🎯 {job['title']}", style_job))
                 
                 style_company = ParagraphStyle('Company', parent=self.styles['Normal'],
                                                 fontSize=10, textColor=colors.HexColor('#555555'),
                                                 spaceAfter=6, fontName='Helvetica-Oblique')
-                story.append(Paragraph(f"{job['company']} | {job['duration']}", style_company))
+                story.append(Paragraph(f"🏢 {job['company']}  |  📅 {job['duration']}", style_company))
                 
                 if isinstance(job['achievements'], str):
                     achievements_list = job['achievements'].split('\n')
@@ -88,21 +88,21 @@ class PDFResumeGenerator:
                 style_project = ParagraphStyle('Project', parent=self.styles['Normal'],
                                                 fontSize=11, textColor=main_color,
                                                 spaceAfter=4, fontName='Helvetica-Bold')
-                story.append(Paragraph(project['name'], style_project))
-                story.append(Paragraph(project['description'], self.styles['Normal']))
+                story.append(Paragraph(f"📁 {project['name']}", style_project))
+                story.append(Paragraph(f"📝 {project['description']}", self.styles['Normal']))
                 story.append(Paragraph(f"🔧 {project['technologies']}", self.styles['Italic']))
                 story.append(Spacer(1, 0.08 * inch))
         
         if your_data['certifications']:
             story.append(self._section_title("🎖️ CERTIFICATIONS", main_color))
             for cert in your_data['certifications']:
-                story.append(Paragraph(f"  ◉  {cert['name']} ({cert['year']})", self.styles['Normal']))
+                story.append(Paragraph(f"  ◉  {cert['name']} 📅 {cert['year']}", self.styles['Normal']))
             story.append(Spacer(1, 0.1 * inch))
         
         if your_data['languages']:
             story.append(self._section_title("🗣️ LANGUAGES", main_color))
             for lang in your_data['languages']:
-                story.append(Paragraph(f"  ◉  {lang['name']} - {lang['level']}", self.styles['Normal']))
+                story.append(Paragraph(f"  ◉  {lang['name']}  🌟 {lang['level']}", self.styles['Normal']))
             story.append(Spacer(1, 0.1 * inch))
         
         if your_data['education']:
@@ -111,14 +111,14 @@ class PDFResumeGenerator:
                 style_degree = ParagraphStyle('Degree', parent=self.styles['Normal'],
                                                fontSize=11, textColor=main_color,
                                                spaceAfter=3, fontName='Helvetica-Bold')
-                story.append(Paragraph(edu['degree'], style_degree))
+                story.append(Paragraph(f"📖 {edu['degree']}", style_degree))
                 story.append(Paragraph(f"🏫 {edu['institution']}  •  📅 {edu['year']}", self.styles['Normal']))
                 story.append(Spacer(1, 0.08 * inch))
         
         if your_data['hobbies']:
             story.append(self._section_title("🎨 INTERESTS & HOBBIES", main_color))
             hobbies_text = "  ◉  ".join([h['name'] for h in your_data['hobbies']])
-            story.append(Paragraph(hobbies_text, self.styles['Normal']))
+            story.append(Paragraph(f"✨ {hobbies_text}", self.styles['Normal']))
             story.append(Spacer(1, 0.1 * inch))
         
         story.append(Spacer(1, 0.3 * inch))
