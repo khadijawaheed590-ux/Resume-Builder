@@ -148,7 +148,7 @@ class ResumeBuilderApp:
         
         self.template_choice = tk.StringVar(value="modern")
         
-        def update_template():
+        def save_template():
             self.my_resume.choose_template(self.template_choice.get())
         
         styles = [
@@ -160,7 +160,7 @@ class ResumeBuilderApp:
         for text, value in styles:
             tk.Radiobutton(main_frame, text=text, variable=self.template_choice,
                           value=value, bg='#f0f0f0', font=('Arial', 12),
-                          padx=20, pady=8, command=update_template).pack(anchor='w')
+                          padx=20, pady=8, command=save_template).pack(anchor='w')
     
     def _save_personal(self):
         name = self.personal_entries['name'].get()
