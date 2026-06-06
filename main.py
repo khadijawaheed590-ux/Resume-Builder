@@ -80,7 +80,7 @@ class ResumeBuilderApp:
         main_frame = tk.Frame(tab, bg='#f0f0f0')
         main_frame.pack(pady=30)
         
-        tk.Label(main_frame, text="Professional Summary:", font=('Arial', 12, 'bold'),
+        tk.Label(main_frame, text="📋 Professional Summary:", font=('Arial', 12, 'bold'),
                 bg='#f0f0f0').pack()
         tk.Label(main_frame, text="(Write 2-3 sentences about yourself)", 
                 font=('Arial', 9), fg='gray', bg='#f0f0f0').pack()
@@ -104,11 +104,11 @@ class ResumeBuilderApp:
         self.edu_school = tk.Entry(input_frame, width=30, font=('Arial', 11))
         self.edu_year = tk.Entry(input_frame, width=15, font=('Arial', 11))
         
-        tk.Label(input_frame, text="Degree:", bg='#f0f0f0', font=('Arial', 10)).grid(row=0, column=0, pady=5)
+        tk.Label(input_frame, text="🎓 Degree:", bg='#f0f0f0', font=('Arial', 10)).grid(row=0, column=0, pady=5)
         self.edu_degree.grid(row=0, column=1, padx=10)
-        tk.Label(input_frame, text="Institution:", bg='#f0f0f0', font=('Arial', 10)).grid(row=1, column=0, pady=5)
+        tk.Label(input_frame, text="🏫 Institution:", bg='#f0f0f0', font=('Arial', 10)).grid(row=1, column=0, pady=5)
         self.edu_school.grid(row=1, column=1, padx=10)
-        tk.Label(input_frame, text="Year:", bg='#f0f0f0', font=('Arial', 10)).grid(row=2, column=0, pady=5)
+        tk.Label(input_frame, text="📅 Year:", bg='#f0f0f0', font=('Arial', 10)).grid(row=2, column=0, pady=5)
         self.edu_year.grid(row=2, column=1, padx=10)
         
         tk.Button(input_frame, text="➕ Add Education", command=self._add_education,
@@ -123,7 +123,7 @@ class ResumeBuilderApp:
         main_frame = tk.Frame(tab, bg='#f0f0f0')
         main_frame.pack(pady=30)
         
-        tk.Label(main_frame, text="Enter a skill:", font=('Arial', 11), bg='#f0f0f0').pack()
+        tk.Label(main_frame, text="💪 Enter a skill:", font=('Arial', 11), bg='#f0f0f0').pack()
         self.skill_entry = tk.Entry(main_frame, width=40, font=('Arial', 11), relief='solid', bd=1)
         self.skill_entry.pack(pady=8)
         tk.Button(main_frame, text="➕ Add Skill", command=self._add_skill,
@@ -144,13 +144,13 @@ class ResumeBuilderApp:
         self.exp_company = tk.Entry(main_frame, width=40, font=('Arial', 11))
         self.exp_duration = tk.Entry(main_frame, width=30, font=('Arial', 11))
         
-        tk.Label(main_frame, text="Job Title:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="💼 Job Title:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.exp_title.pack(pady=3)
-        tk.Label(main_frame, text="Company:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="🏢 Company:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.exp_company.pack(pady=3)
-        tk.Label(main_frame, text="Duration:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="📅 Duration:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.exp_duration.pack(pady=3)
-        tk.Label(main_frame, text="Achievements (one per line):", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="🏆 Achievements (one per line):", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.exp_achievements = scrolledtext.ScrolledText(main_frame, height=5, width=45, font=('Arial', 11))
         self.exp_achievements.pack(pady=5)
         
@@ -169,11 +169,11 @@ class ResumeBuilderApp:
         self.proj_name = tk.Entry(main_frame, width=40, font=('Arial', 11))
         self.proj_tech = tk.Entry(main_frame, width=40, font=('Arial', 11))
         
-        tk.Label(main_frame, text="Project Name:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="📁 Project Name:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.proj_name.pack(pady=3)
-        tk.Label(main_frame, text="Technologies Used:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="🔧 Technologies Used:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.proj_tech.pack(pady=3)
-        tk.Label(main_frame, text="Description:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="📝 Description:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.proj_desc = scrolledtext.ScrolledText(main_frame, height=3, width=45, font=('Arial', 11))
         self.proj_desc.pack(pady=5)
         
@@ -192,9 +192,9 @@ class ResumeBuilderApp:
         self.cert_name = tk.Entry(main_frame, width=40, font=('Arial', 11))
         self.cert_year = tk.Entry(main_frame, width=15, font=('Arial', 11))
         
-        tk.Label(main_frame, text="Certification Name:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="📜 Certification Name:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.cert_name.pack(pady=3)
-        tk.Label(main_frame, text="Year:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="📅 Year:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.cert_year.pack(pady=3)
         
         tk.Button(main_frame, text="➕ Add Certification", command=self._add_certification,
@@ -212,9 +212,9 @@ class ResumeBuilderApp:
         self.lang_name = tk.Entry(main_frame, width=30, font=('Arial', 11))
         self.lang_level = tk.Entry(main_frame, width=20, font=('Arial', 11))
         
-        tk.Label(main_frame, text="Language:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="🌍 Language:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.lang_name.pack(pady=3)
-        tk.Label(main_frame, text="Level (Fluent/Native/Intermediate):", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="⭐ Level (Fluent/Native/Intermediate):", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.lang_level.pack(pady=3)
         
         tk.Button(main_frame, text="➕ Add Language", command=self._add_language,
@@ -229,7 +229,7 @@ class ResumeBuilderApp:
         main_frame = tk.Frame(tab, bg='#f0f0f0')
         main_frame.pack(pady=30)
         
-        tk.Label(main_frame, text="Enter a hobby/interest:", font=('Arial', 11), bg='#f0f0f0').pack()
+        tk.Label(main_frame, text="🎯 Enter a hobby or interest:", font=('Arial', 11), bg='#f0f0f0').pack()
         self.hobby_entry = tk.Entry(main_frame, width=40, font=('Arial', 11), relief='solid', bd=1)
         self.hobby_entry.pack(pady=8)
         tk.Button(main_frame, text="➕ Add Hobby", command=self._add_hobby,
@@ -246,7 +246,7 @@ class ResumeBuilderApp:
         main_frame = tk.Frame(tab, bg='#f0f0f0')
         main_frame.pack(pady=40)
         
-        tk.Label(main_frame, text="Select Your Resume Style:", 
+        tk.Label(main_frame, text="🎨 Select Your Resume Style:", 
                  font=('Arial', 14, 'bold'), bg='#f0f0f0').pack(pady=15)
         
         self.template_choice = tk.StringVar(value="modern")
