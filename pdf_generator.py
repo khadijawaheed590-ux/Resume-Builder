@@ -1,193 +1,183 @@
-
-from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch, mm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from datetime import datetime
-import os
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 class PDFResumeGenerator:
     def __init__(self):
         self.styles = getSampleStyleSheet()
-        self._setup_beautiful_styles()
     
-    def _setup_beautiful_styles(self):
-        # Professional Header Style
+    def make_resume(self, your_data, filename="my_resume.pdf", style="modern"):
+        if style == "modern":
+            return self._make_modern_resume(your_data, filename)
+        elif style == "traditional":
+            return self._make_traditional_resume(your_data, filename)
+        elif style == "professional":
+            return self._make_professional_resume(your_data, filename)
+        else:
+            return self._make_modern_resume(your_data, filename)
+    
+    def _make_modern_resume(self, data, filename):
+        doc = SimpleDocTemplate(filename, pagesize=letter)
+        story = []
+        info = data['personal']
+        
         self.styles.add(ParagraphStyle(
-            name='BeautifulHeader',
+            name='BigBlueName',
             parent=self.styles['Heading1'],
             fontSize=28,
             textColor=colors.HexColor('#1a5490'),
-            spaceAfter=20,
-            alignment=0,
-            fontName='Helvetica-Bold'
+            alignment=0
         ))
+        story.append(Paragraph(info.get('name', 'YOUR NAME'), self.styles['BigBlueName']))
         
-        # Contact Info Style
+        contact = f"{info.get('email', '')}  |  {info.get('phone', '')}  |  {info.get('address', '')}"
         self.styles.add(ParagraphStyle(
-            name='ContactInfo',
+            name='GrayContact',
             parent=self.styles['Normal'],
             fontSize=10,
             textColor=colors.HexColor('#666666'),
-            spaceAfter=15,
-            alignment=0
+            spaceAfter=20
         ))
+        story.append(Paragraph(contact, self.styles['GrayContact']))
         
-        # Section Title Style (Beautiful Blue)
-        self.styles.add(ParagraphStyle(
-            name='BeautifulSection',
-            parent=self.styles['Heading2'],
-            fontSize=16,
-            textColor=colors.HexColor('#1a5490'),
-            spaceBefore=20,
-            spaceAfter=10,
-            fontWeight='bold',
-            borderPadding=5,
-            fontName='Helvetica-Bold'
-        ))
+        blue_line = Table([[' ']], colWidths=[450])
+        blue_line.setStyle(TableStyle([('LINEABOVE', (0, 0), (-1, -1), 1, colors.HexColor('#1a5490'))]))
+        story.append(blue_line)
         
-        # Job Title Style
-        self.styles.add(ParagraphStyle(
-            name='JobTitle',
-            parent=self.styles['Normal'],
-            fontSize=12,
-            textColor=colors.HexColor('#333333'),
-            spaceAfter=5,
-            fontWeight='bold'
-        ))
-        
-        # Company Style
-        self.styles.add(ParagraphStyle(
-            name='CompanyName',
-            parent=self.styles['Normal'],
-            fontSize=11,
-            textColor=colors.HexColor('#1a5490'),
-            spaceAfter=3,
-            fontName='Helvetica-Oblique'
-        ))
-        
-        # Description Style
-        self.styles.add(ParagraphStyle(
-            name='Description',
-            parent=self.styles['Normal'],
-            fontSize=10,
-            textColor=colors.HexColor('#444444'),
-            spaceAfter=8,
-            leftIndent=20
-        ))
-        
-        # Skill Badge Style
-        self.styles.add(ParagraphStyle(
-            name='SkillStyle',
-            parent=self.styles['Normal'],
-            fontSize=10,
-            textColor=colors.HexColor('#1a5490'),
-            backColor=colors.HexColor('#e8f4f8'),
-            spaceAfter=5,
-            leftIndent=10
-        ))
-    
-    def generate_resume(self, resume_data, output_filename="professional_resume.pdf", photo_path=None):
-        doc = SimpleDocTemplate(
-            output_filename,
-            pagesize=letter,
-            rightMargin=72,
-            leftMargin=72,
-            topMargin=72,
-            bottomMargin=72,
-            title="Professional Resume"
-        )
-        
-        story = []
-        
-        # Add Header with Name
-        personal = resume_data['personal']
-        name = personal.get('name', 'YOUR NAME')
-        story.append(Paragraph(name.upper(), self.styles['BeautifulHeader']))
-        
-        # Add Contact Information
-        contact_text = self._format_contact(personal)
-        story.append(Paragraph(contact_text, self.styles['ContactInfo']))
-        story.append(Spacer(1, 0.2 * inch))
-        
-        # Add Divider Line
-        story.append(self._add_divider())
-        story.append(Spacer(1, 0.1 * inch))
-        
-        # Add Profile Summary
-        story.append(Paragraph("PROFESSIONAL SUMMARY", self.styles['BeautifulSection']))
-        summary = personal.get('summary', 'Dedicated professional with strong skills and passion for excellence.')
-        story.append(Paragraph(summary, self.styles['Description']))
-        story.append(Spacer(1, 0.1 * inch))
-        
-        # Add Skills Section (Beautiful Layout)
-        if resume_data['skills']:
-            story.append(Paragraph("CORE COMPETENCIES", self.styles['BeautifulSection']))
-            skills_text = self._format_skills_beautifully(resume_data['skills'])
-            story.append(Paragraph(skills_text, self.styles['SkillStyle']))
+        if data['skills']:
+            story.append(self._make_section_title("CORE SKILLS", '#1a5490'))
+            skills_text = " • ".join([s['name'] for s in data['skills']])
+            story.append(Paragraph(skills_text, self.styles['Normal']))
             story.append(Spacer(1, 0.1 * inch))
         
-        # Add Experience Section
-        if resume_data['experience']:
-            story.append(Paragraph("WORK EXPERIENCE", self.styles['BeautifulSection']))
-            for exp in resume_data['experience']:
-                story.append(Paragraph(exp['title'], self.styles['JobTitle']))
-                story.append(Paragraph(f"{exp['company']} | {exp['duration']}", self.styles['CompanyName']))
-                story.append(Paragraph(exp['description'], self.styles['Description']))
+        if data['experience']:
+            story.append(self._make_section_title("WORK EXPERIENCE", '#1a5490'))
+            for job in data['experience']:
+                story.append(Paragraph(f"<b>{job['title']}</b>", self.styles['Normal']))
+                story.append(Paragraph(f"{job['company']} | {job['duration']}", self.styles['Italic']))
+                story.append(Paragraph(job['description'], self.styles['Normal']))
+                story.append(Spacer(1, 0.1 * inch))
+        
+        if data['education']:
+            story.append(self._make_section_title("EDUCATION", '#1a5490'))
+            for edu in data['education']:
+                story.append(Paragraph(f"<b>{edu['degree']}</b>", self.styles['Normal']))
+                story.append(Paragraph(f"{edu['institution']} - {edu['year']}", self.styles['Normal']))
                 story.append(Spacer(1, 0.05 * inch))
         
-        # Add Education Section
-        if resume_data['education']:
-            story.append(Paragraph("EDUCATION", self.styles['BeautifulSection']))
-            for edu in resume_data['education']:
-                edu_text = f"<b>{edu['degree']}</b><br/>{edu['institution']} - {edu['year']}"
-                if edu.get('grade'):
-                    edu_text += f"<br/><i>Grade: {edu['grade']}</i>"
-                story.append(Paragraph(edu_text, self.styles['Description']))
-                story.append(Spacer(1, 0.05 * inch))
-        
-        # Add Footer
-        story.append(Spacer(1, 0.5 * inch))
-        story.append(self._add_footer())
-        
-        # Build PDF
         doc.build(story)
-        return output_filename
+        return filename
     
-    def _format_contact(self, personal):
-        parts = []
-        if personal.get('email'):
-            parts.append(f"✉ {personal['email']}")
-        if personal.get('phone'):
-            parts.append(f"📞 {personal['phone']}")
-        if personal.get('address'):
-            parts.append(f"📍 {personal['address']}")
-        return " | ".join(parts)
+    def _make_traditional_resume(self, data, filename):
+        doc = SimpleDocTemplate(filename, pagesize=letter)
+        story = []
+        info = data['personal']
+        
+        self.styles.add(ParagraphStyle(
+            name='CenterName',
+            parent=self.styles['Heading1'],
+            fontSize=24,
+            textColor=colors.black,
+            alignment=1
+        ))
+        story.append(Paragraph(info.get('name', 'YOUR NAME'), self.styles['CenterName']))
+        
+        contact = f"{info.get('email', '')}  •  {info.get('phone', '')}  •  {info.get('address', '')}"
+        story.append(Paragraph(contact, self.styles['Normal']))
+        story.append(Spacer(1, 0.1 * inch))
+        
+        black_line = Table([[' ']], colWidths=[450])
+        black_line.setStyle(TableStyle([('LINEABOVE', (0, 0), (-1, -1), 1, colors.black)]))
+        story.append(black_line)
+        
+        if data['experience']:
+            story.append(self._make_section_title("WORK HISTORY", colors.black))
+            for job in data['experience']:
+                story.append(Paragraph(f"<b>{job['title']}</b>", self.styles['Normal']))
+                story.append(Paragraph(f"{job['company']}, {job['duration']}", self.styles['Italic']))
+                story.append(Paragraph(f"  • {job['description']}", self.styles['Normal']))
+                story.append(Spacer(1, 0.1 * inch))
+        
+        if data['education']:
+            story.append(self._make_section_title("EDUCATION", colors.black))
+            for edu in data['education']:
+                story.append(Paragraph(f"<b>{edu['degree']}</b>", self.styles['Normal']))
+                story.append(Paragraph(f"{edu['institution']}, {edu['year']}", self.styles['Normal']))
+        
+        if data['skills']:
+            story.append(self._make_section_title("SKILLS", colors.black))
+            skills_text = ", ".join([s['name'] for s in data['skills']])
+            story.append(Paragraph(skills_text, self.styles['Normal']))
+        
+        doc.build(story)
+        return filename
     
-    def _format_skills_beautifully(self, skills):
-        skill_names = [skill['name'] if isinstance(skill, dict) else skill for skill in skills]
-        return " • ".join(skill_names)
+    def _make_professional_resume(self, data, filename):
+        doc = SimpleDocTemplate(filename, pagesize=letter)
+        story = []
+        info = data['personal']
+        
+        self.styles.add(ParagraphStyle(
+            name='ExecutiveName',
+            parent=self.styles['Heading1'],
+            fontSize=26,
+            textColor=colors.HexColor('#0d3b66'),
+            alignment=0
+        ))
+        story.append(Paragraph(info.get('name', 'YOUR NAME'), self.styles['ExecutiveName']))
+        story.append(Paragraph("Professional Resume", self.styles['Normal']))
+        story.append(Spacer(1, 0.1 * inch))
+        
+        if data['skills']:
+            story.append(self._make_section_title("KEY SKILLS", '#0d3b66'))
+            skills = [s['name'] for s in data['skills']]
+            half = len(skills)//2 + len(skills)%2
+            col1 = skills[:half]
+            col2 = skills[half:]
+            
+            table_data = []
+            for i in range(max(len(col1), len(col2))):
+                row = []
+                row.append(col1[i] if i < len(col1) else "")
+                row.append(col2[i] if i < len(col2) else "")
+                table_data.append(row)
+            
+            skill_table = Table(table_data, colWidths=[200, 200])
+            skill_table.setStyle(TableStyle([
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ]))
+            story.append(skill_table)
+            story.append(Spacer(1, 0.1 * inch))
+        
+        if data['experience']:
+            story.append(self._make_section_title("CAREER HIGHLIGHTS", '#0d3b66'))
+            for job in data['experience']:
+                exp_text = f"<b>{job['title']}</b><br/>"
+                exp_text += f"<font color='#0d3b66'>{job['company']}</font> | {job['duration']}<br/>"
+                exp_text += f"{job['description']}"
+                story.append(Paragraph(exp_text, self.styles['Normal']))
+                story.append(Spacer(1, 0.1 * inch))
+        
+        if data['education']:
+            story.append(self._make_section_title("EDUCATION", '#0d3b66'))
+            for edu in data['education']:
+                story.append(Paragraph(f"<b>{edu['degree']}</b>", self.styles['Normal']))
+                story.append(Paragraph(f"{edu['institution']} • {edu['year']}", self.styles['Normal']))
+        
+        doc.build(story)
+        return filename
     
-    def _add_divider(self):
-        from reportlab.platypus import Table
-        divider = Table([[' ']], colWidths=[450])
-        divider.setStyle(TableStyle([
-            ('LINEABOVE', (0, 0), (-1, -1), 1, colors.HexColor('#1a5490')),
-            ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ]))
-        return divider
-    
-    def _add_footer(self):
-        from reportlab.platypus import Table
-        current_date = datetime.now().strftime("%B %Y")
-        footer_text = f"Generated with Resume Builder | {current_date}"
-        footer = Table([[footer_text]], colWidths=[450])
-        footer.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#999999')),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
-        ]))
-        return footer
+    def _make_section_title(self, title_text, color_code):
+        self.styles.add(ParagraphStyle(
+            name=f'Title_{title_text}',
+            parent=self.styles['Heading2'],
+            fontSize=14,
+            textColor=color_code,
+            spaceBefore=12,
+            spaceAfter=6,
+            fontWeight='bold'
+        ))
+        return Paragraph(title_text, self.styles[f'Title_{title_text}'])

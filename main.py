@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 from resume_logic import ResumeData
@@ -11,337 +10,277 @@ class ResumeBuilderApp:
         self.root.geometry("900x700")
         self.root.configure(bg='#f0f0f0')
         
-        self.resume_data = ResumeData()
+        self.my_resume = ResumeData()
         
-        # Set modern style
-        self.setup_styles()
-        self.create_widgets()
+        self._make_title_bar()
+        self._make_tabs()
+        self._make_progress_bar()
+        self._make_generate_button()
     
-    def setup_styles(self):
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('TNotebook.Tab', padding=[20, 5], font=('Arial', 10, 'bold'))
-        style.configure('TButton', padding=[10, 5], font=('Arial', 10))
-        style.configure('TLabel', font=('Arial', 10), background='#f0f0f0')
-        
-    def create_widgets(self):
-        # Title Frame
+    def _make_title_bar(self):
         title_frame = tk.Frame(self.root, bg='#1a5490', height=80)
         title_frame.pack(fill='x')
         title_frame.pack_propagate(False)
         
-        title_label = tk.Label(title_frame, text="🎯 PROFESSIONAL RESUME BUILDER", 
-                               font=('Arial', 20, 'bold'), 
-                               fg='white', bg='#1a5490')
-        title_label.pack(pady=20)
-        
-        # Main Notebook
+        tk.Label(title_frame, text="RESUME BUILDER PRO", 
+                font=('Arial', 22, 'bold'), 
+                fg='white', bg='#1a5490').pack(pady=20)
+    
+    def _make_tabs(self):
         notebook = ttk.Notebook(self.root)
         notebook.pack(fill='both', expand=True, padx=20, pady=10)
         
-        # Create Tabs
-        self.create_personal_tab(notebook)
-        self.create_education_tab(notebook)
-        self.create_skills_tab(notebook)
-        self.create_experience_tab(notebook)
-        
-        # Progress Bar Frame
-        progress_frame = tk.Frame(self.root, bg='#f0f0f0', height=60)
+        self._tab_personal_info(notebook)
+        self._tab_education(notebook)
+        self._tab_skills(notebook)
+        self._tab_experience(notebook)
+        self._tab_template(notebook)
+    
+    def _make_progress_bar(self):
+        progress_frame = tk.Frame(self.root, bg='#f0f0f0')
         progress_frame.pack(fill='x', padx=20, pady=10)
-        progress_frame.pack_propagate(False)
         
-        self.progress_label = tk.Label(progress_frame, text="Resume Completion: 0%", 
-                                       font=('Arial', 10), bg='#f0f0f0')
+        self.progress_label = tk.Label(progress_frame, text="Completion: 0%", 
+                                       font=('Arial', 11), bg='#f0f0f0')
         self.progress_label.pack()
         
-        self.progress_bar = ttk.Progressbar(progress_frame, length=400, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, length=500, mode='determinate')
         self.progress_bar.pack(pady=5)
-        
-        # Generate Button
-        generate_frame = tk.Frame(self.root, bg='#f0f0f0')
-        generate_frame.pack(pady=20)
-        
-        generate_btn = tk.Button(generate_frame, text="✨ GENERATE PROFESSIONAL RESUME ✨", 
-                                 command=self.generate_resume,
-                                 bg='#1a5490', fg='white', 
-                                 font=('Arial', 12, 'bold'),
-                                 padx=30, pady=10,
-                                 cursor='hand2')
-        generate_btn.pack()
-        
-        self.update_progress()
     
-    def create_personal_tab(self, notebook):
-        tab = tk.Frame(notebook, bg='#f0f0f0')
-        notebook.add(tab, text="📋 Personal Info")
+    def _make_generate_button(self):
+        btn_frame = tk.Frame(self.root, bg='#f0f0f0')
+        btn_frame.pack(pady=20)
         
-        # Create main frame
+        tk.Button(btn_frame, text="GENERATE RESUME PDF", 
+                 command=self._create_pdf,
+                 bg='#28a745', fg='white', 
+                 font=('Arial', 14, 'bold'),
+                 padx=40, pady=12, cursor='hand2').pack()
+    
+    def _tab_personal_info(self, notebook):
+        tab = tk.Frame(notebook, bg='#f0f0f0')
+        notebook.add(tab, text="Personal Info")
+        
         main_frame = tk.Frame(tab, bg='#f0f0f0')
-        main_frame.pack(pady=30, padx=50)
+        main_frame.pack(pady=30)
         
         fields = [
-            ('Full Name:', 'name', 0),
-            ('Email Address:', 'email', 1),
-            ('Phone Number:', 'phone', 2),
-            ('Address:', 'address', 3),
-            ('Professional Summary:', 'summary', 4)
+            ('Full Name:', 'name'),
+            ('Email:', 'email'),
+            ('Phone:', 'phone'),
+            ('Address:', 'address')
         ]
         
         self.personal_entries = {}
         
-        for label, key, row in fields:
+        for i, (label, key) in enumerate(fields):
             tk.Label(main_frame, text=label, font=('Arial', 11, 'bold'), 
-                    bg='#f0f0f0').grid(row=row, column=0, sticky='w', pady=10)
-            
-            if key == 'summary':
-                entry = scrolledtext.ScrolledText(main_frame, height=5, width=40, font=('Arial', 10))
-                entry.grid(row=row, column=1, padx=20, pady=5)
-            else:
-                entry = tk.Entry(main_frame, width=40, font=('Arial', 10), 
-                                relief='solid', bd=1)
-                entry.grid(row=row, column=1, padx=20, pady=5)
-            
+                    bg='#f0f0f0').grid(row=i, column=0, sticky='w', pady=10)
+            entry = tk.Entry(main_frame, width=45, font=('Arial', 11),
+                           relief='solid', bd=1)
+            entry.grid(row=i, column=1, padx=20)
             self.personal_entries[key] = entry
         
-        save_btn = tk.Button(main_frame, text="Save Personal Information", 
-                            command=self.save_personal_info,
-                            bg='#28a745', fg='white',
-                            font=('Arial', 10, 'bold'),
-                            padx=20, pady=5,
-                            cursor='hand2')
-        save_btn.grid(row=5, column=0, columnspan=2, pady=20)
+        tk.Button(main_frame, text="Save Personal Info", 
+                 command=self._save_personal,
+                 bg='#007bff', fg='white',
+                 font=('Arial', 11, 'bold'),
+                 padx=20, pady=5).grid(row=4, column=0, columnspan=2, pady=20)
     
-    def create_education_tab(self, notebook):
+    def _tab_education(self, notebook):
         tab = tk.Frame(notebook, bg='#f0f0f0')
-        notebook.add(tab, text="🎓 Education")
+        notebook.add(tab, text="Education")
         
         main_frame = tk.Frame(tab, bg='#f0f0f0')
-        main_frame.pack(pady=20, padx=50)
-        
-        # Input Frame
-        input_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        input_frame.pack()
-        
-        labels = ['Degree:', 'Institution:', 'Year:', 'Grade (Optional):']
-        self.edu_entries = {}
-        
-        for i, label in enumerate(labels):
-            tk.Label(input_frame, text=label, font=('Arial', 10, 'bold'), 
-                    bg='#f0f0f0').grid(row=i, column=0, sticky='w', pady=5)
-            entry = tk.Entry(input_frame, width=35, font=('Arial', 10),
-                           relief='solid', bd=1)
-            entry.grid(row=i, column=1, padx=10, pady=5)
-            self.edu_entries[label] = entry
-        
-        add_btn = tk.Button(input_frame, text="➕ Add Education", 
-                           command=self.add_education,
-                           bg='#007bff', fg='white',
-                           font=('Arial', 10, 'bold'),
-                           cursor='hand2')
-        add_btn.grid(row=len(labels), column=0, columnspan=2, pady=15)
-        
-        # Listbox Frame
-        listbox_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        listbox_frame.pack(pady=10)
-        
-        tk.Label(listbox_frame, text="Saved Education:", font=('Arial', 10, 'bold'),
-                bg='#f0f0f0').pack()
-        
-        self.edu_listbox = tk.Listbox(listbox_frame, height=6, width=60, 
-                                      font=('Arial', 10))
-        self.edu_listbox.pack(pady=5)
-    
-    def create_skills_tab(self, notebook):
-        tab = tk.Frame(notebook, bg='#f0f0f0')
-        notebook.add(tab, text="💡 Skills")
-        
-        main_frame = tk.Frame(tab, bg='#f0f0f0')
-        main_frame.pack(pady=40, padx=50)
+        main_frame.pack(pady=20)
         
         input_frame = tk.Frame(main_frame, bg='#f0f0f0')
         input_frame.pack()
         
-        tk.Label(input_frame, text="Skill Name:", font=('Arial', 11, 'bold'),
-                bg='#f0f0f0').grid(row=0, column=0, pady=10)
+        self.edu_degree = tk.Entry(input_frame, width=30, font=('Arial', 11))
+        self.edu_school = tk.Entry(input_frame, width=30, font=('Arial', 11))
+        self.edu_year = tk.Entry(input_frame, width=15, font=('Arial', 11))
         
-        self.skill_entry = tk.Entry(input_frame, width=35, font=('Arial', 10),
+        tk.Label(input_frame, text="Degree:", bg='#f0f0f0').grid(row=0, column=0, pady=5)
+        self.edu_degree.grid(row=0, column=1, padx=10)
+        
+        tk.Label(input_frame, text="Institution:", bg='#f0f0f0').grid(row=1, column=0, pady=5)
+        self.edu_school.grid(row=1, column=1, padx=10)
+        
+        tk.Label(input_frame, text="Year:", bg='#f0f0f0').grid(row=2, column=0, pady=5)
+        self.edu_year.grid(row=2, column=1, padx=10)
+        
+        tk.Button(input_frame, text="Add Education", command=self._add_education,
+                 bg='#28a745', fg='white', font=('Arial', 11)).grid(row=3, column=0, columnspan=2, pady=15)
+        
+        self.edu_listbox = tk.Listbox(main_frame, height=5, width=60, font=('Arial', 10))
+        self.edu_listbox.pack(pady=10)
+    
+    def _tab_skills(self, notebook):
+        tab = tk.Frame(notebook, bg='#f0f0f0')
+        notebook.add(tab, text="Skills")
+        
+        main_frame = tk.Frame(tab, bg='#f0f0f0')
+        main_frame.pack(pady=40)
+        
+        tk.Label(main_frame, text="Enter a skill:", font=('Arial', 12), bg='#f0f0f0').pack()
+        self.skill_entry = tk.Entry(main_frame, width=40, font=('Arial', 11),
                                    relief='solid', bd=1)
-        self.skill_entry.grid(row=0, column=1, padx=10, pady=10)
+        self.skill_entry.pack(pady=10)
         
-        add_btn = tk.Button(input_frame, text="➕ Add Skill", 
-                           command=self.add_skill,
-                           bg='#007bff', fg='white',
-                           font=('Arial', 10, 'bold'),
-                           cursor='hand2')
-        add_btn.grid(row=1, column=0, columnspan=2, pady=10)
+        tk.Button(main_frame, text="Add Skill", command=self._add_skill,
+                 bg='#28a745', fg='white', font=('Arial', 11)).pack()
         
-        listbox_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        listbox_frame.pack(pady=20)
+        self.skills_listbox = tk.Listbox(main_frame, height=8, width=50, font=('Arial', 10))
+        self.skills_listbox.pack(pady=20)
         
-        tk.Label(listbox_frame, text="Your Skills:", font=('Arial', 11, 'bold'),
-                bg='#f0f0f0').pack()
-        
-        self.skills_listbox = tk.Listbox(listbox_frame, height=8, width=50,
-                                        font=('Arial', 10))
-        self.skills_listbox.pack(pady=5)
-        
-        remove_btn = tk.Button(listbox_frame, text="❌ Remove Selected Skill",
-                              command=self.remove_skill,
-                              bg='#dc3545', fg='white',
-                              font=('Arial', 9), cursor='hand2')
-        remove_btn.pack(pady=5)
+        tk.Button(main_frame, text="Remove Selected", command=self._remove_skill,
+                 bg='#dc3545', fg='white', font=('Arial', 10)).pack()
     
-    def create_experience_tab(self, notebook):
+    def _tab_experience(self, notebook):
         tab = tk.Frame(notebook, bg='#f0f0f0')
-        notebook.add(tab, text="💼 Experience")
+        notebook.add(tab, text="Experience")
         
         main_frame = tk.Frame(tab, bg='#f0f0f0')
-        main_frame.pack(pady=20, padx=50)
+        main_frame.pack(pady=20)
         
-        input_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        input_frame.pack()
+        self.exp_title = tk.Entry(main_frame, width=40, font=('Arial', 11))
+        self.exp_company = tk.Entry(main_frame, width=40, font=('Arial', 11))
+        self.exp_duration = tk.Entry(main_frame, width=30, font=('Arial', 11))
         
-        exp_fields = [
-            ('Job Title:', 'title'),
-            ('Company:', 'company'),
-            ('Duration (e.g., 2022-2024):', 'duration'),
-            ('Description:', 'description')
+        tk.Label(main_frame, text="Job Title:", bg='#f0f0f0').pack()
+        self.exp_title.pack(pady=5)
+        
+        tk.Label(main_frame, text="Company:", bg='#f0f0f0').pack()
+        self.exp_company.pack(pady=5)
+        
+        tk.Label(main_frame, text="Duration (e.g., 2022-2024):", bg='#f0f0f0').pack()
+        self.exp_duration.pack(pady=5)
+        
+        tk.Label(main_frame, text="Description:", bg='#f0f0f0').pack()
+        self.exp_description = scrolledtext.ScrolledText(main_frame, height=4, width=45)
+        self.exp_description.pack(pady=5)
+        
+        tk.Button(main_frame, text="Add Experience", command=self._add_experience,
+                 bg='#28a745', fg='white', font=('Arial', 11)).pack(pady=10)
+        
+        self.exp_listbox = tk.Listbox(main_frame, height=5, width=70, font=('Arial', 10))
+        self.exp_listbox.pack(pady=10)
+    
+    def _tab_template(self, notebook):
+        tab = tk.Frame(notebook, bg='#f0f0f0')
+        notebook.add(tab, text="Template")
+        
+        main_frame = tk.Frame(tab, bg='#f0f0f0')
+        main_frame.pack(pady=50)
+        
+        tk.Label(main_frame, text="Select Resume Style:", 
+                 font=('Arial', 14, 'bold'), bg='#f0f0f0').pack(pady=20)
+        
+        self.template_choice = tk.StringVar(value="modern")
+        
+        styles = [
+            ("Modern (Blue Theme)", "modern"),
+            ("Traditional (Classic B&W)", "traditional"),
+            ("Professional (Executive Style)", "professional")
         ]
         
-        self.exp_entries = {}
-        
-        for i, (label, key) in enumerate(exp_fields):
-            tk.Label(input_frame, text=label, font=('Arial', 10, 'bold'),
-                    bg='#f0f0f0').grid(row=i, column=0, sticky='w', pady=5)
-            
-            if key == 'description':
-                entry = scrolledtext.ScrolledText(input_frame, height=4, width=40,
-                                                 font=('Arial', 10))
-                entry.grid(row=i, column=1, padx=10, pady=5)
-            else:
-                entry = tk.Entry(input_frame, width=40, font=('Arial', 10),
-                               relief='solid', bd=1)
-                entry.grid(row=i, column=1, padx=10, pady=5)
-            
-            self.exp_entries[key] = entry
-        
-        add_btn = tk.Button(input_frame, text="➕ Add Experience", 
-                           command=self.add_experience,
-                           bg='#007bff', fg='white',
-                           font=('Arial', 10, 'bold'),
-                           cursor='hand2')
-        add_btn.grid(row=len(exp_fields), column=0, columnspan=2, pady=15)
-        
-        listbox_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        listbox_frame.pack(pady=10)
-        
-        tk.Label(listbox_frame, text="Work Experience:", font=('Arial', 11, 'bold'),
-                bg='#f0f0f0').pack()
-        
-        self.exp_listbox = tk.Listbox(listbox_frame, height=6, width=70,
-                                     font=('Arial', 10))
-        self.exp_listbox.pack(pady=5)
+        for text, value in styles:
+            tk.Radiobutton(main_frame, text=text, variable=self.template_choice,
+                          value=value, bg='#f0f0f0', font=('Arial', 12),
+                          padx=20, pady=8).pack(anchor='w')
     
-    def save_personal_info(self):
+    def _save_personal(self):
         name = self.personal_entries['name'].get()
         email = self.personal_entries['email'].get()
         phone = self.personal_entries['phone'].get()
         address = self.personal_entries['address'].get()
-        summary = self.personal_entries['summary'].get("1.0", tk.END).strip()
         
         if not name:
-            messagebox.showwarning("Warning", "Name is required!")
+            messagebox.showwarning("Warning", "Please enter your name!")
             return
         
-        self.resume_data.set_personal_info(name, email, phone, address)
-        self.resume_data.personal_info['summary'] = summary
-        
-        messagebox.showinfo("Success", "Personal information saved!")
-        self.update_progress()
+        self.my_resume.save_personal_info(name, email, phone, address)
+        messagebox.showinfo("Success", "Personal info saved!")
+        self._update_progress()
     
-    def add_education(self):
-        degree = self.edu_entries['Degree:'].get()
-        institution = self.edu_entries['Institution:'].get()
-        year = self.edu_entries['Year:'].get()
-        grade = self.edu_entries['Grade (Optional):'].get()
+    def _add_education(self):
+        degree = self.edu_degree.get()
+        school = self.edu_school.get()
+        year = self.edu_year.get()
         
-        if degree and institution and year:
-            self.resume_data.add_education(degree, institution, year, grade)
-            self.edu_listbox.insert(tk.END, f"{degree} - {institution} ({year})")
-            
-            # Clear entries
-            for entry in self.edu_entries.values():
-                entry.delete(0, tk.END)
-            
-            self.update_progress()
+        if degree and school and year:
+            self.my_resume.add_education(degree, school, year)
+            self.edu_listbox.insert(tk.END, f"{degree} - {school} ({year})")
+            self.edu_degree.delete(0, tk.END)
+            self.edu_school.delete(0, tk.END)
+            self.edu_year.delete(0, tk.END)
+            self._update_progress()
             messagebox.showinfo("Success", "Education added!")
         else:
-            messagebox.showwarning("Warning", "Please fill Degree, Institution, and Year!")
+            messagebox.showwarning("Warning", "Please fill all fields!")
     
-    def add_skill(self):
+    def _add_skill(self):
         skill = self.skill_entry.get()
         if skill:
-            self.resume_data.add_skill(skill)
+            self.my_resume.add_skill(skill)
             self.skills_listbox.insert(tk.END, skill)
             self.skill_entry.delete(0, tk.END)
-            self.update_progress()
+            self._update_progress()
     
-    def remove_skill(self):
-        selection = self.skills_listbox.curselection()
-        if selection:
-            index = selection[0]
+    def _remove_skill(self):
+        selected = self.skills_listbox.curselection()
+        if selected:
+            index = selected[0]
             self.skills_listbox.delete(index)
-            # Rebuild skills list
-            self.resume_data.skills = []
+            self.my_resume.skills = []
             for i in range(self.skills_listbox.size()):
-                self.resume_data.add_skill(self.skills_listbox.get(i))
-            self.update_progress()
+                self.my_resume.add_skill(self.skills_listbox.get(i))
+            self._update_progress()
     
-    def add_experience(self):
-        title = self.exp_entries['title'].get()
-        company = self.exp_entries['company'].get()
-        duration = self.exp_entries['duration'].get()
-        description = self.exp_entries['description'].get("1.0", tk.END).strip()
+    def _add_experience(self):
+        title = self.exp_title.get()
+        company = self.exp_company.get()
+        duration = self.exp_duration.get()
+        description = self.exp_description.get("1.0", tk.END).strip()
         
         if title and company and duration and description:
-            self.resume_data.add_experience(title, company, duration, description)
+            self.my_resume.add_experience(title, company, duration, description)
             self.exp_listbox.insert(tk.END, f"{title} at {company} ({duration})")
-            
-            # Clear entries
-            self.exp_entries['title'].delete(0, tk.END)
-            self.exp_entries['company'].delete(0, tk.END)
-            self.exp_entries['duration'].delete(0, tk.END)
-            self.exp_entries['description'].delete("1.0", tk.END)
-            
-            self.update_progress()
+            self.exp_title.delete(0, tk.END)
+            self.exp_company.delete(0, tk.END)
+            self.exp_duration.delete(0, tk.END)
+            self.exp_description.delete("1.0", tk.END)
+            self._update_progress()
             messagebox.showinfo("Success", "Experience added!")
         else:
-            messagebox.showwarning("Warning", "Please fill all experience fields!")
+            messagebox.showwarning("Warning", "Please fill all fields!")
     
-    def update_progress(self):
-        completion = self.resume_data.calculate_completion()
-        self.progress_bar['value'] = completion
-        self.progress_label.config(text=f"Resume Completion: {completion}%")
+    def _update_progress(self):
+        percent = self.my_resume.show_completion_percentage()
+        self.progress_bar['value'] = percent
+        self.progress_label.config(text=f"Completion: {percent}%")
         
-        if completion == 100:
+        if percent == 100:
             self.progress_label.config(fg='green')
-        elif completion >= 50:
+        elif percent >= 50:
             self.progress_label.config(fg='orange')
         else:
             self.progress_label.config(fg='red')
     
-    def generate_resume(self):
+    def _create_pdf(self):
         try:
-            generator = PDFResumeGenerator()
-            filename = generator.generate_resume(
-                self.resume_data.get_formatted_data(),
-                "Professional_Resume.pdf"
+            pdf_maker = PDFResumeGenerator()
+            filename = pdf_maker.make_resume(
+                self.my_resume.get_all_data(),
+                "My_Resume.pdf",
+                style=self.template_choice.get()
             )
-            messagebox.showinfo("Success!", f"✅ Resume generated successfully!\n\nSaved as: {filename}\n\nCheck your project folder!")
+            messagebox.showinfo("Success!", f"Resume saved as: {filename}")
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to generate PDF: {str(e)}\n\nMake sure you have installed: pip install reportlab")
+            messagebox.showerror("Error", f"Failed: {str(e)}\n\nRun: pip install reportlab")
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = ResumeBuilderApp(root)
-    root.mainloop()
+    window = tk.Tk()
+    app = ResumeBuilderApp(window)
+    window.mainloop()
