@@ -231,8 +231,11 @@ class ResumeBuilderApp:
     
     def _create_pdf(self):
         try:
+            name = self.my_resume.personal_info.get('name', 'Resume')
+            filename = f"{name}_Resume.pdf"
+            
             pdf_maker = PDFResumeGenerator()
-            filename = pdf_maker.make_resume(self.my_resume.get_all_data(), "My_Resume.pdf")
+            pdf_maker.make_resume(self.my_resume.get_all_data(), filename)
             messagebox.showinfo("Success!", f"Resume saved as: {filename}")
         except Exception as e:
             messagebox.showerror("Error", f"Failed: {str(e)}\n\nRun: pip install reportlab")
