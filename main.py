@@ -7,7 +7,7 @@ class ResumeBuilderApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Professional Resume Builder")
-        self.root.geometry("900x700")
+        self.root.geometry("900x800")
         self.root.configure(bg='#f0f0f0')
         
         self.my_resume = ResumeData()
@@ -44,7 +44,7 @@ class ResumeBuilderApp:
     
     def _make_generate_button(self):
         btn_frame = tk.Frame(self.root, bg='#f0f0f0')
-        btn_frame.pack(pady=20)
+        btn_frame.pack(fill='x', padx=20, pady=20)
         tk.Button(btn_frame, text="GENERATE RESUME PDF", command=self._create_pdf,
                  bg='#28a745', fg='white', font=('Arial', 14, 'bold'),
                  padx=40, pady=12, cursor='hand2').pack()
