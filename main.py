@@ -6,7 +6,7 @@ from pdf_generator import PDFResumeGenerator
 class ResumeBuilderApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("✨ Professional Resume Builder ✨")
+        self.root.title("Professional Resume Builder")
         self.root.geometry("850x750")
         self.root.configure(bg='#f0f0f0')
         
@@ -50,7 +50,7 @@ class ResumeBuilderApp:
     def _make_generate_button(self):
         btn_frame = tk.Frame(self.root, bg='#f0f0f0')
         btn_frame.pack(fill='x', padx=10, pady=10)
-        tk.Button(btn_frame, text="🚀 GENERATE PROFESSIONAL RESUME 🚀", command=self._create_pdf,
+        tk.Button(btn_frame, text="🚀 GENERATE RESUME PDF 🚀", command=self._create_pdf,
                  bg='#28a745', fg='white', font=('Arial', 13, 'bold'),
                  padx=30, pady=10, cursor='hand2').pack()
     
@@ -144,7 +144,7 @@ class ResumeBuilderApp:
         self.exp_company = tk.Entry(main_frame, width=40, font=('Arial', 11))
         self.exp_duration = tk.Entry(main_frame, width=30, font=('Arial', 11))
         
-        tk.Label(main_frame, text="💼 Job Title:", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="🎯 Job Title:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.exp_title.pack(pady=3)
         tk.Label(main_frame, text="🏢 Company:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.exp_company.pack(pady=3)
@@ -173,9 +173,6 @@ class ResumeBuilderApp:
         self.proj_name.pack(pady=3)
         tk.Label(main_frame, text="🔧 Technologies Used:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.proj_tech.pack(pady=3)
-        tk.Label(main_frame, text="📝 Description:", bg='#f0f0f0', font=('Arial', 10)).pack()
-        self.proj_desc = scrolledtext.ScrolledText(main_frame, height=3, width=45, font=('Arial', 11))
-        self.proj_desc.pack(pady=5)
         
         tk.Button(main_frame, text="➕ Add Project", command=self._add_project,
                  bg='#28a745', fg='white', font=('Arial', 10)).pack(pady=10)
@@ -214,7 +211,7 @@ class ResumeBuilderApp:
         
         tk.Label(main_frame, text="🌍 Language:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.lang_name.pack(pady=3)
-        tk.Label(main_frame, text="⭐ Level (Fluent/Native/Intermediate):", bg='#f0f0f0', font=('Arial', 10)).pack()
+        tk.Label(main_frame, text="⭐ Level:", bg='#f0f0f0', font=('Arial', 10)).pack()
         self.lang_level.pack(pady=3)
         
         tk.Button(main_frame, text="➕ Add Language", command=self._add_language,
@@ -229,7 +226,7 @@ class ResumeBuilderApp:
         main_frame = tk.Frame(tab, bg='#f0f0f0')
         main_frame.pack(pady=30)
         
-        tk.Label(main_frame, text="🎯 Enter a hobby or interest:", font=('Arial', 11), bg='#f0f0f0').pack()
+        tk.Label(main_frame, text="🎯 Enter a hobby:", font=('Arial', 11), bg='#f0f0f0').pack()
         self.hobby_entry = tk.Entry(main_frame, width=40, font=('Arial', 11), relief='solid', bd=1)
         self.hobby_entry.pack(pady=8)
         tk.Button(main_frame, text="➕ Add Hobby", command=self._add_hobby,
@@ -255,7 +252,7 @@ class ResumeBuilderApp:
             self.my_resume.choose_template(self.template_choice.get())
         
         styles = [
-            ("✨ Modern - Blue Theme (Fresh & Professional)", "modern"),
+            ("✨ Modern - Blue Theme", "modern"),
             ("📜 Traditional - Classic Black & White", "traditional"),
             ("💼 Professional - Executive Dark Blue", "professional")
         ]
@@ -332,18 +329,18 @@ class ResumeBuilderApp:
             self.exp_achievements.delete("1.0", tk.END)
             self._update_progress()
             messagebox.showinfo("✅ Success", "Experience added!")
+        else:
+            messagebox.showwarning("⚠️ Warning", "Please fill all fields including achievements!")
     
     def _add_project(self):
         name = self.proj_name.get()
         tech = self.proj_tech.get()
-        desc = self.proj_desc.get("1.0", tk.END).strip()
         
-        if name and tech and desc:
-            self.my_resume.add_project(name, desc, tech)
+        if name and tech:
+            self.my_resume.add_project(name, tech)
             self.proj_listbox.insert(tk.END, f"{name} ({tech})")
             self.proj_name.delete(0, tk.END)
             self.proj_tech.delete(0, tk.END)
-            self.proj_desc.delete("1.0", tk.END)
             self._update_progress()
             messagebox.showinfo("✅ Success", "Project added!")
     
@@ -397,13 +394,13 @@ class ResumeBuilderApp:
     def _create_pdf(self):
         try:
             name = self.my_resume.personal_info.get('name', 'Resume')
-            filename = f"{name}_Professional_Resume.pdf"
+            filename = f"{name}_Resume.pdf"
             
             pdf_maker = PDFResumeGenerator()
             pdf_maker.make_resume(self.my_resume.get_all_data(), filename)
-            messagebox.showinfo("🎉 Success!", f"✅ Resume saved as: {filename}\n📍 Check your project folder!")
+            messagebox.showinfo("🎉 Success!", f"✅ Resume saved as: {filename}")
         except Exception as e:
-            messagebox.showerror("❌ Error", f"Failed: {str(e)}\n\n💡 Run: pip install reportlab")
+            messagebox.showerror("❌ Error", f"Failed: {str(e)}\n\nRun: pip install reportlab")
 
 if __name__ == "__main__":
     window = tk.Tk()
