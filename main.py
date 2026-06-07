@@ -2,14 +2,18 @@ import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext, filedialog
 from resume_logic import ResumeData
 from pdf_generator import PDFResumeGenerator
+from login import LoginWindow
+from database import Database
 
 class ResumeBuilderApp:
-    def __init__(self, root):
+    def __init__(self, root, user_data=None):
         self.root = root
         self.root.title("★ Professional Resume Builder ★")
         self.root.geometry("900x800")
         self.root.configure(bg='#f0f0f0')
         
+        self.user_data = user_data
+        self.db = Database()
         self.my_resume = ResumeData()
         
         self._make_title_bar()
@@ -17,13 +21,44 @@ class ResumeBuilderApp:
         self._make_tabs()
         self._make_progress_bar()
         self._make_generate_button()
+        
+        if user_data:
+            self._load_saved_resumes()
+    
+    def _load_saved_resumes(self):
+        resumes = self.db.get_user_resumes(self.user_data['id'])
+        if resumes:
+            latest = resumes[0]
+            self.my_resume.save_personal_info(
+                latest.get('name', ''),
+                latest.get('email', ''),
+                latest.get('phone', ''),
+                latest.get('address', '')
+            )
+            for edu in latest.get('education', []):
+                self.my_resume.add_education(edu.get('degree', ''), edu.get('institution', ''), edu.get('year', ''), edu.get('gpa', ''))
+            for skill in latest.get('skills', []):
+                self.my_resume.add_skill(skill.get('name', ''))
+            for exp in latest.get('experience', []):
+                self.my_resume.add_experience(exp.get('title', ''), exp.get('company', ''), exp.get('duration', ''), exp.get('achievements', ''))
+            for proj in latest.get('projects', []):
+                self.my_resume.add_project(proj.get('name', ''), proj.get('technologies', ''))
+            for cert in latest.get('certifications', []):
+                self.my_resume.add_certification(cert.get('name', ''), cert.get('year', ''))
+            for lang in latest.get('languages', []):
+                self.my_resume.add_language(lang.get('name', ''), lang.get('level', ''))
+            for hobby in latest.get('hobbies', []):
+                self.my_resume.add_hobby(hobby.get('name', ''))
+            self.my_resume.choose_template(latest.get('template', 'modern'))
+            self._update_progress()
     
     def _make_title_bar(self):
         title_frame = tk.Frame(self.root, bg='#1a5490', height=60)
         title_frame.pack(fill='x')
         title_frame.pack_propagate(False)
-        tk.Label(title_frame, text="★ RESUME BUILDER PRO ★", 
-                font=('Arial', 20, 'bold'), fg='white', bg='#1a5490').pack(pady=15)
+        user_text = f" - Welcome {self.user_data['username']}" if self.user_data else ""
+        tk.Label(title_frame, text=f"★ RESUME BUILDER PRO ★{user_text}", 
+                font=('Arial', 18, 'bold'), fg='white', bg='#1a5490').pack(pady=15)
     
     def _make_menu_bar(self):
         menubar = tk.Menu(self.root)
@@ -31,10 +66,16 @@ class ResumeBuilderApp:
         
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="💾 Save Resume", command=self._save_resume)
-        file_menu.add_command(label="📂 Load Resume", command=self._load_resume)
+        file_menu.add_command(label="💾 Save to Database", command=self._save_to_database)
         file_menu.add_separator()
         file_menu.add_command(label="❌ Exit", command=self.root.quit)
+    
+    def _save_to_database(self):
+        if self.user_data:
+            self.db.save_resume(self.user_data['id'], self.my_resume.get_all_data())
+            messagebox.showinfo("✅ Success", "Resume saved to database!")
+        else:
+            messagebox.showerror("❌ Error", "No user logged in!")
     
     def _make_tabs(self):
         notebook = ttk.Notebook(self.root)
@@ -403,69 +444,6 @@ class ResumeBuilderApp:
                 self.my_resume.add_hobby(self.hobby_listbox.get(i))
             self._update_progress()
     
-    def _save_resume(self):
-        filename = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
-        if filename:
-            self.my_resume.save_to_file(filename)
-            messagebox.showinfo("✅ Success", f"Resume saved to {filename}")
-    
-    def _load_resume(self):
-        filename = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
-        if filename:
-            if self.my_resume.load_from_file(filename):
-                self._load_data_to_ui()
-                messagebox.showinfo("✅ Success", f"Resume loaded from {filename}")
-            else:
-                messagebox.showerror("❌ Error", "Failed to load resume")
-    
-    def _load_data_to_ui(self):
-        data = self.my_resume.get_all_data()
-        personal = data.get('personal', {})
-        self.personal_entries['name'].delete(0, tk.END)
-        self.personal_entries['name'].insert(0, personal.get('name', ''))
-        self.personal_entries['email'].delete(0, tk.END)
-        self.personal_entries['email'].insert(0, personal.get('email', ''))
-        self.personal_entries['phone'].delete(0, tk.END)
-        self.personal_entries['phone'].insert(0, personal.get('phone', ''))
-        self.personal_entries['address'].delete(0, tk.END)
-        self.personal_entries['address'].insert(0, personal.get('address', ''))
-        
-        self.summary_text.delete("1.0", tk.END)
-        self.summary_text.insert("1.0", data.get('summary', ''))
-        
-        self.edu_listbox.delete(0, tk.END)
-        for edu in data.get('education', []):
-            display = f"{edu['degree']} - {edu['institution']} ({edu['year']})"
-            if edu.get('gpa'):
-                display += f" [GPA: {edu['gpa']}]"
-            self.edu_listbox.insert(tk.END, display)
-        
-        self.skills_listbox.delete(0, tk.END)
-        for skill in data.get('skills', []):
-            self.skills_listbox.insert(tk.END, skill['name'])
-        
-        self.exp_listbox.delete(0, tk.END)
-        for exp in data.get('experience', []):
-            self.exp_listbox.insert(tk.END, f"{exp['title']} at {exp['company']} ({exp['duration']})")
-        
-        self.proj_listbox.delete(0, tk.END)
-        for proj in data.get('projects', []):
-            self.proj_listbox.insert(tk.END, f"{proj['name']} ({proj['technologies']})")
-        
-        self.cert_listbox.delete(0, tk.END)
-        for cert in data.get('certifications', []):
-            self.cert_listbox.insert(tk.END, f"{cert['name']} ({cert['year']})")
-        
-        self.lang_listbox.delete(0, tk.END)
-        for lang in data.get('languages', []):
-            self.lang_listbox.insert(tk.END, f"{lang['name']} - {lang['level']}")
-        
-        self.hobby_listbox.delete(0, tk.END)
-        for hobby in data.get('hobbies', []):
-            self.hobby_listbox.insert(tk.END, hobby['name'])
-        
-        self._update_progress()
-    
     def _update_progress(self):
         percent = self.my_resume.show_completion_percentage()
         self.progress_bar['value'] = percent
@@ -482,7 +460,12 @@ class ResumeBuilderApp:
         except Exception as e:
             messagebox.showerror("❌ Error", f"Failed: {str(e)}\n\nRun: pip install reportlab")
 
+def start_app(user_data):
+    root = tk.Tk()
+    app = ResumeBuilderApp(root, user_data)
+    root.mainloop()
+
 if __name__ == "__main__":
-    window = tk.Tk()
-    app = ResumeBuilderApp(window)
-    window.mainloop()
+    login_root = tk.Tk()
+    login_app = LoginWindow(login_root, start_app)
+    login_root.mainloop()
