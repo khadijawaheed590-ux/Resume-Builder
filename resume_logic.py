@@ -1,3 +1,6 @@
+import json
+import os
+
 class ResumeData:
     def __init__(self):
         self.personal_info = {}
@@ -22,11 +25,12 @@ class ResumeData:
     def add_summary(self, summary_text):
         self.summary = summary_text
     
-    def add_education(self, degree, school, year):
+    def add_education(self, degree, school, year, gpa=""):
         self.education.append({
             'degree': degree,
             'institution': school,
-            'year': year
+            'year': year,
+            'gpa': gpa
         })
     
     def add_skill(self, skill_name):
@@ -52,10 +56,9 @@ class ResumeData:
             'level': level
         })
     
-    def add_project(self, project_name, description, technologies):
+    def add_project(self, project_name, technologies):
         self.projects.append({
             'name': project_name,
-            'description': description,
             'technologies': technologies
         })
     
@@ -79,9 +82,32 @@ class ResumeData:
             'template': self.template_choice
         }
     
+    def save_to_file(self, filename):
+        data = self.get_all_data()
+        with open(filename, 'w') as f:
+            json.dump(data, f)
+        return True
+    
+    def load_from_file(self, filename):
+        if os.path.exists(filename):
+            with open(filename, 'r') as f:
+                data = json.load(f)
+                self.personal_info = data.get('personal', {})
+                self.summary = data.get('summary', '')
+                self.education = data.get('education', [])
+                self.skills = data.get('skills', [])
+                self.experience = data.get('experience', [])
+                self.certifications = data.get('certifications', [])
+                self.languages = data.get('languages', [])
+                self.projects = data.get('projects', [])
+                self.hobbies = data.get('hobbies', [])
+                self.template_choice = data.get('template', 'modern')
+            return True
+        return False
+    
     def show_completion_percentage(self):
         filled = 0
-        total = 10
+        total = 9
         
         if self.personal_info.get('name'): filled += 1
         if self.personal_info.get('email'): filled += 1
@@ -92,6 +118,5 @@ class ResumeData:
         if len(self.certifications) > 0: filled += 1
         if len(self.languages) > 0: filled += 1
         if len(self.projects) > 0: filled += 1
-        if len(self.hobbies) > 0: filled += 1
         
         return int((filled / total) * 100)
