@@ -9,14 +9,14 @@ class LoginWindow:
         self.db = Database()
         
         self.root.title("Login - Resume Builder")
-        self.root.geometry("400x400")
+        self.root.geometry("400x420")
         self.root.configure(bg='#1a5490')
         
         self.setup_ui()
     
     def setup_ui(self):
         main_frame = tk.Frame(self.root, bg='white', padx=30, pady=30)
-        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=350, height=320)
+        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=350, height=350)
         
         tk.Label(main_frame, text="RESUME BUILDER", 
                 font=('Arial', 18, 'bold'), fg='#1a5490', bg='white').pack(pady=10)
@@ -59,7 +59,7 @@ class LoginWindow:
     def show_signup(self):
         self.signup_window = tk.Toplevel(self.root)
         self.signup_window.title("Sign Up")
-        self.signup_window.geometry("400x450")
+        self.signup_window.geometry("400x480")
         self.signup_window.configure(bg='white')
         
         main_frame = tk.Frame(self.signup_window, bg='white', padx=30, pady=30)
